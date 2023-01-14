@@ -38,9 +38,12 @@ public class OrderController {
     
     @Autowired
     OrderService orderService;
+    @Autowired
     PersonService personService;
     //CompanyService companyService;
+    @Autowired
     ProductService productService;
+    @Autowired
     ServicioService serviceService; // arreglar clase
 
     @GetMapping("/list")
@@ -111,20 +114,27 @@ public class OrderController {
 
        Order order = new Order();
        //System.out.println(personService.getOne(idPerson).get());
-       personService.getOne(idPerson);
-       //order.setPerson(personService.getOne(idPerson).get()); // revisar lo opcional del service
-/*
+       //personService.getOne(idPerson);
+       order.setPerson(personService.getOne(idPerson).get()); // revisar lo opcional del service
+
        order.setIdCompany(idCompany);
 
-       Set<Product> products = new HashSet<>();
-       for (int id : idProducts) {
-           Product product = productService.getOne(id).get();
-           products.add(product);
-       }
+       
+        if (idProducts.length > 0) {
+        //TODO: esto pasarlo al service y repository
+            Set<Product> products = new HashSet<>();
+            for (int id : idProducts) {
+                Product product = productService.getOne(id).get();
+                products.add(product);
+            }
 
-       order.setProducts(products);
-       //orderService.save(order);
-  */
-       return new ResponseEntity<Message>(new Message("Orden agregada"), HttpStatus.CREATED);
+            order.setProducts(products);
+        }
+
+        //TODO: aca falta hacer algo similar para servicios
+
+        orderService.save(order);
+
+        return new ResponseEntity<Message>(new Message("Orden agregada"), HttpStatus.CREATED);
    }
 }
