@@ -30,7 +30,7 @@ import com.example.crisalisbackend.Security.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class AuthController {
     
     @Autowired
@@ -49,6 +49,7 @@ public class AuthController {
     JwtProvider jwtProvider;
 
     @PostMapping("/nuevo")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<?> nuevo (@Valid @RequestBody NewUser newUser, BindingResult bindingResult){
         System.out.println("hola");
         if (bindingResult.hasErrors())
@@ -77,6 +78,7 @@ public class AuthController {
         
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLogin userLogin, BindingResult bindingResult){
         

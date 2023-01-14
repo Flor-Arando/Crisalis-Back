@@ -1,9 +1,12 @@
 package com.example.crisalisbackend.model;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Product {
@@ -13,6 +16,9 @@ public class Product {
     private String name;
     private float unitPrice;
     private boolean warranty;
+
+    @ManyToMany(mappedBy = "products")
+    Set<Order> orders;
 
     public Product() {
     }

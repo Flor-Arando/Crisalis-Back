@@ -22,7 +22,7 @@ public class PersonService {
         return personRepository.findAll();
     }
     
-    public Optional<Person> getOne(int id){
+    public Optional<Person> getOne(int id) {
         return personRepository.findById(id);
     }
 

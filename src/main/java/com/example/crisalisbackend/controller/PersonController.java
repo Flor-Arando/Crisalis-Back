@@ -21,6 +21,9 @@ import com.example.crisalisbackend.Security.controller.Message;
 import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.service.PersonService;
 
+
+import java.util.Optional;
+
 @RestController
 @RequestMapping("persona")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -30,10 +33,16 @@ public class PersonController {
     PersonService personService;
     
     @GetMapping("/list")
+    public ResponseEntity<Optional<Person>> list(){
+        Optional<Person> p = personService.getOne(1);
+        return new ResponseEntity<>(p, HttpStatus.OK); 
+    }
+/*
     public ResponseEntity<List<Person>> list(){
         List<Person> listPersons = personService.list();
-            return new ResponseEntity<>(listPersons, HttpStatus.OK); 
-    }
+        return new ResponseEntity<>(listPersons, HttpStatus.OK); 
+    }*/
+
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id){ //deberia ir Person pero me daba error porque se confunde con ResponseEntity<Message>

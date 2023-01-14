@@ -1,11 +1,17 @@
 package com.example.crisalisbackend.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="_person")
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +19,9 @@ public class Person {
     private String firstName;
     private String lastName;
     private int dni;
+
+    @OneToMany(mappedBy = "person")
+    private List<Order> orders = new ArrayList<>();
 
     public Person() {
     }
@@ -62,5 +71,14 @@ public class Person {
     public void setDni(int dni) {
         this.dni = dni;
     }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
    
+    
 }
