@@ -27,7 +27,6 @@ public class Person {
     }
 
     public Person(String firstName, String lastName, int dni) {
-        
         this.firstName = firstName;
         this.lastName = lastName;
         this.dni = dni;
@@ -37,36 +36,29 @@ public class Person {
         return id;
     }
 
-
     public void setId(int id) {
         this.id = id;
     }
-
 
     public String getFirstName() {
         return firstName;
     }
 
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-
 
     public String getLastName() {
         return lastName;
     }
 
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-
     public int getDni() {
         return dni;
     }
-
 
     public void setDni(int dni) {
         this.dni = dni;
@@ -80,5 +72,7 @@ public class Person {
         this.orders = orders;
     }
    
-    
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }

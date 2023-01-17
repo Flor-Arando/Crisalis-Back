@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Product {
@@ -17,14 +17,13 @@ public class Product {
     private float unitPrice;
     private boolean warranty;
 
-    @ManyToMany(mappedBy = "products")
-    Set<Order> orders;
+    @OneToMany(mappedBy = "product")
+    private Set<OrderProduct> orderProducts;
 
     public Product() {
     }
 
     public Product(String name, float unitPrice, boolean warranty) {
-        
         this.name = name;
         this.unitPrice = unitPrice;
         this.warranty = warranty;
@@ -62,5 +61,11 @@ public class Product {
         this.warranty = warranty;
     }
 
-  
+    public Set<OrderProduct> getOrderProducts() {
+        return orderProducts;
+    }
+
+    public void setOrders(Set<OrderProduct> orderProducts) {
+        this.orderProducts = orderProducts;
+    }
 }

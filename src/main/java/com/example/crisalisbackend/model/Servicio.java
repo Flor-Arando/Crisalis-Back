@@ -14,18 +14,16 @@ public class Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private float unitPrice;
+    private float unitPrice; // TODO: cambiar nombre
     private boolean support;
 
     @ManyToMany(mappedBy = "services")
-    Set<Order> orders;
-    
+    Set<Order> orders;    
 
     public Servicio() {
     }
 
     public Servicio(String name, float unitPrice, boolean support) {
-        
         this.name = name;
         this.unitPrice = unitPrice;
         this.support = support;
