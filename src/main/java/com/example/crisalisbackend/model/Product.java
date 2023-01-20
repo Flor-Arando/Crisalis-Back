@@ -7,15 +7,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "_product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private float unitPrice;
-    private boolean warranty;
+    
 
     @OneToMany(mappedBy = "product")
     private Set<OrderProduct> orderProducts;
@@ -23,10 +25,10 @@ public class Product {
     public Product() {
     }
 
-    public Product(String name, float unitPrice, boolean warranty) {
+    public Product(String name, float unitPrice) {
         this.name = name;
         this.unitPrice = unitPrice;
-        this.warranty = warranty;
+        
     }
 
     public int getId() {
@@ -51,14 +53,6 @@ public class Product {
 
     public void setUnitPrice(float unitPrice) {
         this.unitPrice = unitPrice;
-    }
-
-    public boolean isWarranty() {
-        return warranty;
-    }
-
-    public void setWarranty(boolean warranty) {
-        this.warranty = warranty;
     }
 
     public Set<OrderProduct> getOrderProducts() {

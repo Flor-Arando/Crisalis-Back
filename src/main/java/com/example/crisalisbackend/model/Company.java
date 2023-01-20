@@ -9,16 +9,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "_company")
 public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String companyName;
-    private Integer cuil; // TODO: arreglar, tambien get y set
-    private Date startActivity;
+    private int cuit;
+    private Date activityStart;
 
     @OneToMany(mappedBy = "company")
     private List<Order> orders = new ArrayList<>();
@@ -26,11 +28,10 @@ public class Company {
     public Company() {
     }
 
-    public Company(String companyName, Date startActivity, Integer cuil) {
-        
+    public Company(String companyName, Date activityStart, int cuit) {
         this.companyName = companyName;
-        this.startActivity = startActivity;
-        this.cuil = cuil;
+        this.activityStart = activityStart;
+        this.cuit = cuit;
     }
 
     public int getId() {
@@ -49,19 +50,19 @@ public class Company {
         this.companyName = companyName;
     }
 
-    public Integer getCuil() {
-        return cuil;
+    public int getCuit() {
+        return cuit;
     }
 
-    public void setCuil(Integer cuil) {
-        this.cuil = cuil;
+    public void setCuit(int cuit) {
+        this.cuit = cuit;
     }
 
-    public Date getStartActivity() {
-        return startActivity;
+    public Date getActivityStart() {
+        return activityStart;
     }
 
-    public void setStartActivity(Date startActivity) {
-        this.startActivity = startActivity;
+    public void setActivityStart(Date activityStart) {
+        this.activityStart = activityStart;
     }  
 }

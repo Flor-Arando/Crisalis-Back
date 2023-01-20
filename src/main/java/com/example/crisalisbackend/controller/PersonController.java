@@ -1,7 +1,5 @@
 package com.example.crisalisbackend.controller;
 
-import java.util.List;
-
 //import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,7 @@ import com.example.crisalisbackend.Security.controller.Message;
 import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.service.PersonService;
 
-
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -33,18 +31,18 @@ public class PersonController {
     PersonService personService;
     
     @GetMapping("/list")
-    public ResponseEntity<Optional<Person>> list(){
+    /*public ResponseEntity<Optional<Person>> list(){
         Optional<Person> p = personService.getOne(1);
         return new ResponseEntity<>(p, HttpStatus.OK); 
-    }
-/*
+    }*/
+
     public ResponseEntity<List<Person>> list(){
         List<Person> listPersons = personService.list();
         return new ResponseEntity<>(listPersons, HttpStatus.OK); 
-    }*/
+    }
 
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id){ //deberia ir Person pero me daba error porque se confunde con ResponseEntity<Message>
        
         if(!personService.existsById(id)) {
@@ -58,9 +56,8 @@ public class PersonController {
     @PostMapping("/create")
      public ResponseEntity<?> create(@RequestBody dtoPerson dtoPerson){     
 
-        /*if(StringUtils.isBlank(dtoPerson.getFirstName())) {
-            return new ResponseEntity<Message>(new Message("El nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-        }*/
+        /*public static boolean validarName(String name)
+            return name.matches("^()")*/
             
         if(personService.existsByFirstName(dtoPerson.getFirstName())) {
             return new ResponseEntity<Message>(new Message("La persona ya existe"), HttpStatus.BAD_REQUEST);//cambiar por DNI

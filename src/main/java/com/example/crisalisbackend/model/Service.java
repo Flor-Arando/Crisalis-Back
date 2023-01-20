@@ -7,26 +7,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+import org.springframework.data.relational.core.mapping.Embedded.Nullable;
 
 @Entity
-public class Servicio {
+@Table(name = "_service")
+public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private float unitPrice; // TODO: cambiar nombre
-    private boolean support;
+    private float price;
+    @Nullable
+    private float supportPrice; // TODO: que se pueda poner null
 
     @ManyToMany(mappedBy = "services")
     Set<Order> orders;    
 
-    public Servicio() {
+    public Service() {
     }
 
-    public Servicio(String name, float unitPrice, boolean support) {
+    public Service(String name, float price, float supportPrice) {
         this.name = name;
-        this.unitPrice = unitPrice;
-        this.support = support;
+        this.price = price;
+        this.supportPrice = supportPrice;
     }
 
     public int getId() {
@@ -45,19 +50,19 @@ public class Servicio {
         this.name = name;
     }
 
-    public float getUnitPrice() {
-        return unitPrice;
+    public float getPrice() {
+        return price;
     }
 
-    public void setUnitPrice(float unitPrice) {
-        this.unitPrice = unitPrice;
+    public void setPrice(float price) {
+        this.price = price;
     }
 
-    public boolean isSupport() {
-        return support;
+    public float getSupportPrice() {
+        return supportPrice;
     }
 
-    public void setSupport(boolean support) {
-        this.support = support;
+    public void setSupportPrice(float supportPrice) {
+        this.supportPrice = supportPrice;
     }   
 }

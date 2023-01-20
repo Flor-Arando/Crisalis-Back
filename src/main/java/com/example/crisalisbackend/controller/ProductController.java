@@ -57,7 +57,7 @@ public class ProductController {
         no hay ID en dtoProduct por eso no va esta condición
         }*/
         
-        Product product = new Product(dtoProduct.getName(), dtoProduct.getUnitPrice(), dtoProduct.isWarranty());
+        Product product = new Product(dtoProduct.getName(), dtoProduct.getUnitPrice());
         productService.save(product);
         
             return new ResponseEntity<Message>(new Message("Producto agregado"), HttpStatus.OK);
@@ -79,7 +79,6 @@ public class ProductController {
         Product product = productService.getOne(id).get();
         product.setName(dtoProduct.getName());
         product.setUnitPrice((dtoProduct.getUnitPrice()));
-        product.setWarranty((dtoProduct.isWarranty()));
         
         productService.save(product);
             return new ResponseEntity <Message>(new Message("Producto actualizado"), HttpStatus.OK);

@@ -24,6 +24,8 @@ public class OrderProduct {
     private Product product;
 
     private int warranty;
+    private double totalPrice;
+    private int quantity;
 
     public OrderProduct() {
 
@@ -65,5 +67,21 @@ public class OrderProduct {
 
     public void setWarranty(int warranty) {
         this.warranty = warranty;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

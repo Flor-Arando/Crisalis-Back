@@ -48,11 +48,11 @@ public class CompanyController {
     @PostMapping("/create")
      public ResponseEntity<?> create(@RequestBody dtoCompany dtoCompany){     
             
-        if(companyService.existsByCuil(dtoCompany.getCuil())) {
+        if(companyService.existsByCuit(dtoCompany.getCuit())) {
             return new ResponseEntity<Message>(new Message("El cuil de la empresa ya existe"), HttpStatus.BAD_REQUEST);//cambiar por DNI
         }
         
-        Company company = new Company(dtoCompany.getCompanyName(), dtoCompany.getStartActivity(), dtoCompany.getCuil());
+        Company company = new Company(dtoCompany.getCompanyName(), dtoCompany.getActivityStart(), dtoCompany.getCuit());
         companyService.save(company);
         
             return new ResponseEntity<Message>(new Message("Empresa agregada"), HttpStatus.OK);
@@ -65,16 +65,16 @@ public class CompanyController {
             return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.BAD_REQUEST);
         }
             
-        //bien?
-        if(companyService.existsByCuil(dtoCompany.getCuil())) {
+        
+        if(companyService.existsByCuit(dtoCompany.getCuit())) {
             return new ResponseEntity<Message>(new Message("La empresa ya existe"), HttpStatus.BAD_REQUEST);
         } 
            
               
         Company company = companyService.getOne(id).get();
         company.setCompanyName(dtoCompany.getCompanyName());
-        company.setStartActivity((dtoCompany.getStartActivity()));
-        company.setCuil((dtoCompany.getCuil()));
+        company.setActivityStart((dtoCompany.getActivityStart()));
+        company.setCuit((dtoCompany.getCuit()));
         
         companyService.save(company);
             return new ResponseEntity <Message>(new Message("Empresa actualizada"), HttpStatus.OK);

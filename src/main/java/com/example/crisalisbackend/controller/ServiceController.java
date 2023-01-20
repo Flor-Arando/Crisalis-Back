@@ -15,67 +15,66 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.crisalisbackend.Dto.dtoServicio;
+import com.example.crisalisbackend.Dto.ServiceDTO;
 import com.example.crisalisbackend.Security.controller.Message;
-import com.example.crisalisbackend.model.Servicio;
-import com.example.crisalisbackend.service.ServicioService;
+import com.example.crisalisbackend.model.Service;
+import com.example.crisalisbackend.service.ServiceService;
 
 @RestController
 @RequestMapping("servicio")
 @CrossOrigin(origins = "http://localhost:4200")
-public class ServicioController {
+public class ServiceController {
     @Autowired
-    ServicioService servicioService;
+    ServiceService serviceService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<Servicio>> list() {
-        List<Servicio>listServicios = servicioService.list();
-            return new ResponseEntity<>(listServicios, HttpStatus.OK);
+    public ResponseEntity<List<Service>> list() {
+        List<Service>listServices = serviceService.list();
+            return new ResponseEntity<>(listServices, HttpStatus.OK);
     }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id){ 
        
-        if(!servicioService.existsById(id)) {
+        if(!serviceService.existsById(id)) {
             return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.NOT_FOUND);
         }
            
-        Servicio servicio = servicioService.getOne(id).get();
-            return new ResponseEntity<>(servicio, HttpStatus.OK);
+        Service service = serviceService.getOne(id).get();
+            return new ResponseEntity<>(service, HttpStatus.OK);
     }
 
     @PostMapping("/create") //AGREGAR VALIDACIONES
-     public ResponseEntity<?> create(@RequestBody dtoServicio dtoServicio){     
+     public ResponseEntity<?> create(@RequestBody ServiceDTO serviceDTO){     
         
-        Servicio servicio = new Servicio(dtoServicio.getName(), dtoServicio.getUnitPrice(), dtoServicio.isSupport());
-        servicioService.save(servicio); //ordenar como en DTO 
+        Service service = new Service(serviceDTO.getName(), serviceDTO.getPrice(), serviceDTO.getSupportPrice());
+        serviceService.save(service); //ordenar como en DTO 
         
             return new ResponseEntity<Message>(new Message("Servicio agregado"), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}") //AGREGAR VALIDACIONES
-    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody dtoServicio dtoServicio){
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody ServiceDTO serviceDTO){
         
-        if(!servicioService.existsById(id)) {
+        if(!serviceService.existsById(id)) {
             return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.BAD_REQUEST);
         }
               
-        Servicio servicio = servicioService.getOne(id).get();
-        servicio.setName(dtoServicio.getName());
-        servicio.setUnitPrice((dtoServicio.getUnitPrice()));
-        servicio.setSupport((dtoServicio.isSupport()));
+        Service service = serviceService.getOne(id).get();
+        service.setName(serviceDTO.getName());
+        service.setPrice((serviceDTO.getPrice()));
+        service.setSupportPrice(serviceDTO.getSupportPrice());
         
-        servicioService.save(servicio);
+        serviceService.save(service);
             return new ResponseEntity <Message>(new Message("Servicio actualizado"), HttpStatus.OK);            
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
-        if (!servicioService.existsById(id)) {
+        if (!serviceService.existsById(id)) {
             return new ResponseEntity <Message>(new Message("El ID no existe"), HttpStatus.NOT_FOUND);
         }
-        servicioService.delete(id);
+        serviceService.delete(id);
             return new ResponseEntity <Message>(new Message("Servicio eliminado"), HttpStatus.OK);
     }
-
 }

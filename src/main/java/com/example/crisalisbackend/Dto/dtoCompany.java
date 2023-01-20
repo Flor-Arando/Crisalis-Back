@@ -8,14 +8,14 @@ public class dtoCompany {
     @NotBlank
     private String companyName;
     @NotBlank
-    private Integer cuil;
+    private Integer cuit;
     @NotBlank
-    private Date startActivity;
+    private Date activityStart;
     
-    public dtoCompany(@NotBlank String companyName, @NotBlank Integer cuil, @NotBlank Date startActivity) {
+    public dtoCompany(@NotBlank String companyName, @NotBlank Integer cuit, @NotBlank Date activityStart) {
         this.companyName = companyName;
-        this.cuil = cuil;
-        this.startActivity = startActivity;
+        this.cuit = cuit;
+        this.activityStart = activityStart;
     }
 
     public dtoCompany() {
@@ -29,20 +29,20 @@ public class dtoCompany {
         this.companyName = companyName;
     }
 
-    public Integer getCuil() {
-        return cuil;
+    public Integer getCuit() {
+        return cuit;
     }
 
-    public void setCuil(Integer cuil) {
-        this.cuil = cuil;
+    public void setCuit(Integer cuit) {
+        this.cuit = cuit;
     }
 
-    public Date getStartActivity() {
-        return startActivity;
+    public Date getActivityStart() {
+        return activityStart;
     }
 
-    public void setStartActivity(Date startActivity) {
-        this.startActivity = startActivity;
+    public void setActivityStart(Date activityStart) {
+        this.activityStart = activityStart;
     }
     
 }

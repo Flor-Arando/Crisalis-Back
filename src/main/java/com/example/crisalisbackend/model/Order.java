@@ -1,5 +1,6 @@
 package com.example.crisalisbackend.model;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -22,6 +23,8 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private Date creationDate;
+    private Date lastModification;
 
     @ManyToOne
     @JoinColumn(name="id_person")
@@ -41,7 +44,7 @@ public class Order {
         name = "_order_service", 
         joinColumns = @JoinColumn(name = "id_order"),
         inverseJoinColumns = @JoinColumn(name = "id_service"))
-    Set<Servicio> services;
+    Set<Service> services;
 
     public Order() {
     }
@@ -70,11 +73,11 @@ public class Order {
         this.orderProducts = orderProducts;
     }
 
-    public Set<Servicio> getServices() {
+    public Set<Service> getServices() {
         return services;
     }
 
-    public void setServices(Set<Servicio> services) {
+    public void setServices(Set<Service> services) {
         this.services = services;
     }
 
@@ -84,5 +87,21 @@ public class Order {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Date getLastModification() {
+        return lastModification;
+    }
+
+    public void setLastModification(Date lastModification) {
+        this.lastModification = lastModification;
     }
 }

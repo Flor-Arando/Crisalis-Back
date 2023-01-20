@@ -1,6 +1,7 @@
 package com.example.crisalisbackend.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,16 +24,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.crisalisbackend.Dto.OrderDTO;
 import com.example.crisalisbackend.Dto.OrderRequestDTO;
 import com.example.crisalisbackend.Security.controller.Message;
+import com.example.crisalisbackend.model.Company;
 import com.example.crisalisbackend.model.Order;
 import com.example.crisalisbackend.model.OrderProduct;
+import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.model.Product;
-import com.example.crisalisbackend.model.Servicio;
+import com.example.crisalisbackend.model.Service;
 import com.example.crisalisbackend.service.CompanyService;
 import com.example.crisalisbackend.service.OrderProductService;
 import com.example.crisalisbackend.service.OrderService;
 import com.example.crisalisbackend.service.PersonService;
 import com.example.crisalisbackend.service.ProductService;
-import com.example.crisalisbackend.service.ServicioService;
+import com.example.crisalisbackend.service.ServiceService;
 
 @RestController
 @RequestMapping("order")
@@ -47,7 +50,7 @@ public class OrderController {
     @Autowired
     ProductService productService;
     @Autowired
-    ServicioService serviceService; // TODO: arreglar clase
+    ServiceService serviceService;
     @Autowired
     OrderProductService orderProductService;
 
@@ -89,7 +92,7 @@ public class OrderController {
     {
         "idPerson" : 1,
         "idCompany" : 1,
-        "products" : [{ "id" : 1, "warranty" : 2}, { "id" : 2, "warranty" : 5}],
+        "products" : [{ "id" : 1, "warranty" : 2, "quantity": 3}, { "id" : 2, "warranty" : 5, "quantity": 1}],
         "services" : [1, 2]
     }
     */
@@ -128,12 +131,12 @@ public class OrderController {
         
         orderDTO.setPerson(order.getPerson().getFullName());
 
-        for (Servicio service : order.getServices()) {
+        for (Service service : order.getServices()) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", service.getId());
             data.put("name", service.getName());
-            data.put("support", service.isSupport());
-            data.put("price", service.getUnitPrice());
+            data.put("support", service.getSupportPrice());
+            data.put("price", service.getPrice());
             orderDTO.addService(data);
         }
 
@@ -144,6 +147,8 @@ public class OrderController {
             data.put("name", product.getName());
             data.put("unit_price", product.getUnitPrice());
             data.put("warranty", orderProduct.getWarranty());
+            data.put("quantity", orderProduct.getQuantity());
+            data.put("total_price", orderProduct.getTotalPrice());
             orderDTO.addProduct(data);
         }
 
@@ -162,13 +167,16 @@ public class OrderController {
 
         if (data.getServices().size() > 0) {
             // TODO: esto pasarlo al service y repository
-            Set<Servicio> services = new HashSet<>();
+            Set<Service> services = new HashSet<>();
             for (Integer idService : data.getServices()) {
-                services.add(serviceService.getOne(idService).get());
+                services.add(serviceService.getOne(idService).get()); //TODO: cambiar
             }
 
             order.setServices(services);
         }
+
+        order.setCreationDate(new Date());
+        order.setLastModification(null);
 
         orderService.save(order);
 
@@ -182,8 +190,15 @@ public class OrderController {
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(product);
                 orderProduct.setWarranty((int) productData.get("warranty"));
+                orderProduct.setQuantity((int)productData.get("quantity"));
+                orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
                 orderProductService.save(orderProduct);
             }
         }
+    }
+
+    private double calculateProductTotalPrice (Product product, int quantity, int idCompany) {
+        double tax = idCompany > 0 ? 1.035 : 1; // TODO: ver por que no se puede usar float
+        return product.getUnitPrice() * 1.21 * tax * quantity;
     }
 }

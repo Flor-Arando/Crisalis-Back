@@ -11,6 +11,6 @@ import com.example.crisalisbackend.model.Company;
 public interface CompanyRepository extends JpaRepository <Company, Integer> {
     public Optional<Company> findByCompanyName(String companyName);
     /*public boolean existsByCompanyName(String companyName);*/
-    public boolean existsByCuil(Integer cuil);
+    public boolean existsByCuit(Integer cuit);
     
 }

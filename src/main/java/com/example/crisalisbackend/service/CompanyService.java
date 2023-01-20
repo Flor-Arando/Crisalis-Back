@@ -42,7 +42,7 @@ public class CompanyService {
         return companyRepository.existsById(id);
     }
     
-    public boolean existsByCuil(Integer cuil){
-        return companyRepository.existsByCuil(cuil);
+    public boolean existsByCuit(Integer cuit){
+        return companyRepository.existsByCuit(cuit);
     } //prueba para validacion
 }
