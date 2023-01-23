@@ -3,10 +3,9 @@ package com.example.crisalisbackend.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +45,7 @@ import com.example.crisalisbackend.service.TaxService;
 @CrossOrigin(origins = "http://localhost:4200")
 public class OrderController {
     @Autowired
-    /*OrderService*/com.example.crisalisbackend.service.OrderService orderService;
+    com.example.crisalisbackend.service.OrderService orderService;
     @Autowired
     PersonService personService;
     @Autowired
@@ -80,6 +79,7 @@ public class OrderController {
         }
 
         orderProductService.deleteByOrderId(id);
+        orderServiceService.deleteByOrderId(id);
         orderService.delete(id);
         return new ResponseEntity <Message>(new Message("Pedido eliminado."), HttpStatus.OK);
     }
@@ -100,16 +100,20 @@ public class OrderController {
     {
         "idPerson" : 1,
         "idCompany" : 1,
-        "products" : [{ "id" : 1, "warranty" : 2, "quantity": 3}, { "id" : 2, "warranty" : 5, "quantity": 1}],
-        "services" : [1, 2]
+        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 1, "tax" : "IVA"}],
+        "services" : [{"id" : 1}]
     }
     */
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrderRequestDTO data) {
-        // TODO: faltan validaciones
-
         Order order = new Order();
-        this.saveOrder(order, data);
+        
+        try {
+            this.saveOrder(order, data);
+        } catch (Exception e) {
+            return new ResponseEntity<Message>(new Message(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
         return new ResponseEntity<Message>(new Message("Orden agregada"), HttpStatus.CREATED);
     }
 
@@ -117,14 +121,26 @@ public class OrderController {
     EJEMPLO DE REQUEST
     {
         "idPerson" : 1,
-        "products" : [{ "id" : 1, "warranty" : 20}],
-        "services" : [1]
+        "idCompany" : 2,
+        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10, "tax" : "IVA"}],
+        "services" : []
     }
     */
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int idOrder, @RequestBody OrderRequestDTO data) {
-        Order order = orderService.getOne(idOrder).get();
-        this.saveOrder(order, data);
+        
+        try {
+            Optional<Order> order = orderService.getOne(idOrder);
+
+            if (order.isEmpty()) {
+                throw new Exception("No se encontró el pedido solicitado");
+            }
+
+            this.saveOrder(order.get(), data);
+        } catch (Exception e) {
+            return new ResponseEntity<Message>(new Message(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         return new ResponseEntity<Message>(new Message("Orden actualizada"), HttpStatus.OK);
     }
 
@@ -139,14 +155,6 @@ public class OrderController {
         
         orderDTO.setPerson(order.getPerson().getFullName());
 
-        /*for (Service service : order.getServices()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", service.getId());
-            data.put("name", service.getName());
-            data.put("support", service.getSupportPrice());
-            data.put("price", service.getPrice());
-            orderDTO.addService(data);
-        }*/
         for (OrderService orderService : order.getOrderServices()) {
             Map<String, Object> data = new HashMap<>();
             Service service = orderService.getService();
@@ -172,54 +180,70 @@ public class OrderController {
         return orderDTO;
     }
 
-    private void saveOrder(Order order, OrderRequestDTO data) {
-        order.setPerson(personService.getOne(data.getIdPerson()).get()); // TODO: revisar lo opcional del service
-        
-        int idCompany = data.getIdCompany();
-        if (idCompany > 0) {
-            order.setCompany(companyService.getOne(idCompany).get()); // Si no llega IdCompany, queda en NULL
+    private void saveOrder(Order order, OrderRequestDTO data) throws Exception {
+        // TODO: falta validar todos los valores que se reciben en la solicitud
+
+        if (order.getId() > 0) {
+            order.setLastModification(new Date());
         } else {
-            order.setCompany(null);
+            order.setCreationDate(new Date());
         }
 
-        /*if (data.getServices().size() > 0) {
-            // TODO: esto pasarlo al service y repository
-            Set<Service> services = new HashSet<>();
-            for (Integer idService : data.getServices()) {
-                services.add(serviceService.getOne(idService).get()); //TODO: cambiar
+        Optional<Person> person = personService.getOne(data.getIdPerson());
+        if (person.isEmpty()) {
+            throw new Exception("No se encontró la persona solicitada");
+        }
+        order.setPerson(person.get());
+
+        int idCompany = data.getIdCompany();
+        if (idCompany > 0) {
+            Optional<Company> company = companyService.getOne(data.getIdCompany());
+            if (company.isEmpty()) {
+                throw new Exception("No se encontró la empresa solicitada");
+            }
+    
+            order.setCompany(company.get());
+        } else {
+            order.setCompany(null); // Si no llega IdCompany, queda en NULL
+        }
+
+        for (Map<String, Object> serviceData : data.getServices()) {
+            Optional<Service> service = serviceService.getOne((int) serviceData.get("id"));
+
+            if (service.isEmpty()) {
+                throw new Exception("No se encontró el servicio con id " + serviceData.get("id"));
+            }
+        }
+                
+        for (Map<String, Object> productData : data.getProducts()) {
+            Optional<Product> product = productService.getOne((int) productData.get("id"));
+            if (product.isEmpty()) {
+                throw new Exception("No se encontró el producto con id " + productData.get("id"));
             }
 
-            order.setServices(services);
-        }*/
-
-        order.setCreationDate(new Date());
-        order.setLastModification(null);
+            Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
+            if (tax.isEmpty()) {
+                throw new Exception("No se encontró el impuesto con id " + productData.get("tax"));
+            }
+        }
 
         orderService.save(order);
 
+        orderServiceService.deleteByOrderId(order.getId());
         if (data.getServices().size() > 0) {
-            orderServiceService.deleteByOrderId(order.getId());
-
-            // TODO: esto pasarlo al service y repository
-            for (Map<String, Object> productData : data.getServices()) {
+            for (Map<String, Object> serviceData : data.getServices()) {
                 OrderService orderService = new OrderService();
-                Service service = serviceService.getOne((int) productData.get("id")).get();
+                Service service = serviceService.getOne((int) serviceData.get("id")).get();
                 orderService.setOrder(order);
                 orderService.setService(service);
-                orderService.setTotalPrice(999);
+                orderService.setTotalPrice(999); // TODO: calcular valor con descuentos
                 orderServiceService.save(orderService);
             }
         }
 
+        orderProductService.deleteByOrderId(order.getId());
         if (data.getProducts().size() > 0) {
-            orderProductService.deleteByOrderId(order.getId());
-
-            // TODO: esto pasarlo al service y repository
             for (Map<String, Object> productData : data.getProducts()) {
-
-System.out.println(productData);
-
-
                 OrderProduct orderProduct = new OrderProduct();
                 Tax tax = taxService.getByName((String) productData.get("tax")).get();
                 Product product = productService.getOne((int) productData.get("id")).get();

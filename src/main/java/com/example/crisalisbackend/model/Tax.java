@@ -25,6 +25,10 @@ public class Tax {
     @OneToMany(mappedBy = "tax")
     private Set<OrderService> orderServices;
     
+    public Tax() {
+
+    }
+    
     public Tax(int id, String name, float aliquot) {
         this.id = id;
         this.name = name;
