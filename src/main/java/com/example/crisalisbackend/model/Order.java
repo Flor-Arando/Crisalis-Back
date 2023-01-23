@@ -39,13 +39,16 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private Set<OrderProduct> orderProducts;
 
+    @OneToMany(mappedBy = "order")
+    private Set<OrderService> orderServices;
+/*
     @ManyToMany
     @JoinTable(
         name = "_order_service", 
         joinColumns = @JoinColumn(name = "id_order"),
         inverseJoinColumns = @JoinColumn(name = "id_service"))
     Set<Service> services;
-
+*/
     public Order() {
     }
 
@@ -73,12 +76,20 @@ public class Order {
         this.orderProducts = orderProducts;
     }
 
-    public Set<Service> getServices() {
+    /*public Set<Service> getServices() {
         return services;
     }
 
     public void setServices(Set<Service> services) {
         this.services = services;
+    }*/
+
+    public Set<OrderService> getOrderServices() {
+        return orderServices;
+    }
+
+    public void setOrderServices(Set<OrderService> orderServices) {
+        this.orderServices = orderServices;
     }
 
     public Person getPerson() {

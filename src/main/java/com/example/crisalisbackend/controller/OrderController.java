@@ -27,22 +27,26 @@ import com.example.crisalisbackend.Security.controller.Message;
 import com.example.crisalisbackend.model.Company;
 import com.example.crisalisbackend.model.Order;
 import com.example.crisalisbackend.model.OrderProduct;
+import com.example.crisalisbackend.model.OrderService;
 import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.model.Product;
 import com.example.crisalisbackend.model.Service;
+import com.example.crisalisbackend.model.Tax;
 import com.example.crisalisbackend.service.CompanyService;
 import com.example.crisalisbackend.service.OrderProductService;
-import com.example.crisalisbackend.service.OrderService;
+import com.example.crisalisbackend.service.OrderServiceService;
+//import com.example.crisalisbackend.service.OrderService;
 import com.example.crisalisbackend.service.PersonService;
 import com.example.crisalisbackend.service.ProductService;
 import com.example.crisalisbackend.service.ServiceService;
+import com.example.crisalisbackend.service.TaxService;
 
 @RestController
 @RequestMapping("order")
 @CrossOrigin(origins = "http://localhost:4200")
 public class OrderController {
     @Autowired
-    OrderService orderService;
+    /*OrderService*/com.example.crisalisbackend.service.OrderService orderService;
     @Autowired
     PersonService personService;
     @Autowired
@@ -53,6 +57,10 @@ public class OrderController {
     ServiceService serviceService;
     @Autowired
     OrderProductService orderProductService;
+    @Autowired
+    OrderServiceService orderServiceService;
+    @Autowired
+    TaxService taxService;
 
     @GetMapping("/list")
     public ResponseEntity<List<OrderDTO>> list() {
@@ -131,12 +139,21 @@ public class OrderController {
         
         orderDTO.setPerson(order.getPerson().getFullName());
 
-        for (Service service : order.getServices()) {
+        /*for (Service service : order.getServices()) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", service.getId());
             data.put("name", service.getName());
             data.put("support", service.getSupportPrice());
             data.put("price", service.getPrice());
+            orderDTO.addService(data);
+        }*/
+        for (OrderService orderService : order.getOrderServices()) {
+            Map<String, Object> data = new HashMap<>();
+            Service service = orderService.getService();
+            data.put("id", service.getId());
+            data.put("name", service.getName());
+            data.put("price", service.getPrice());
+            data.put("support_price", service.getSupportPrice());
             orderDTO.addService(data);
         }
 
@@ -165,7 +182,7 @@ public class OrderController {
             order.setCompany(null);
         }
 
-        if (data.getServices().size() > 0) {
+        /*if (data.getServices().size() > 0) {
             // TODO: esto pasarlo al service y repository
             Set<Service> services = new HashSet<>();
             for (Integer idService : data.getServices()) {
@@ -173,25 +190,45 @@ public class OrderController {
             }
 
             order.setServices(services);
-        }
+        }*/
 
         order.setCreationDate(new Date());
         order.setLastModification(null);
 
         orderService.save(order);
 
+        if (data.getServices().size() > 0) {
+            orderServiceService.deleteByOrderId(order.getId());
+
+            // TODO: esto pasarlo al service y repository
+            for (Map<String, Object> productData : data.getServices()) {
+                OrderService orderService = new OrderService();
+                Service service = serviceService.getOne((int) productData.get("id")).get();
+                orderService.setOrder(order);
+                orderService.setService(service);
+                orderService.setTotalPrice(999);
+                orderServiceService.save(orderService);
+            }
+        }
+
         if (data.getProducts().size() > 0) {
             orderProductService.deleteByOrderId(order.getId());
 
             // TODO: esto pasarlo al service y repository
             for (Map<String, Object> productData : data.getProducts()) {
+
+System.out.println(productData);
+
+
                 OrderProduct orderProduct = new OrderProduct();
+                Tax tax = taxService.getByName((String) productData.get("tax")).get();
                 Product product = productService.getOne((int) productData.get("id")).get();
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(product);
                 orderProduct.setWarranty((int) productData.get("warranty"));
-                orderProduct.setQuantity((int)productData.get("quantity"));
+                orderProduct.setQuantity((int) productData.get("quantity"));
                 orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
+                orderProduct.setTax(tax);
                 orderProductService.save(orderProduct);
             }
         }
@@ -202,3 +239,6 @@ public class OrderController {
         return product.getUnitPrice() * 1.21 * tax * quantity;
     }
 }
+//TODO: cambiar metodo calculateProductTotalPrice en un service y que los valores de tax esten cargados en
+//la base de datos y los tome de ahi a los valores 
+//checkbox en abm de productos y servicios

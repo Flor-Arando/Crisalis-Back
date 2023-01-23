@@ -8,7 +8,7 @@ public class OrderRequestDTO {
     private int idPerson;
     private int idCompany;
     private ArrayList<Map<String, Object>> products;
-    private ArrayList<Integer> services;
+    private ArrayList<Map<String, Object>> services;
     private int quantity;
     
     public OrderRequestDTO() {
@@ -42,7 +42,7 @@ public class OrderRequestDTO {
         return products;
     }
 
-    public ArrayList<Integer> getServices() {
+    public ArrayList<Map<String, Object>> getServices() {
         return services;
     }
 
@@ -50,7 +50,7 @@ public class OrderRequestDTO {
         this.products = products;
     }
 
-    public void setServices(ArrayList<Integer> services) {
+    public void setServices(ArrayList<Map<String, Object>> services) {
         this.services = services;
     }
 

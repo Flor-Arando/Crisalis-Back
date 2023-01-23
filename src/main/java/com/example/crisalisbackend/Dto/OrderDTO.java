@@ -49,4 +49,12 @@ public class OrderDTO {
     public ArrayList<Map<String, Object>> getProducts() {
         return products;
     }
+
+    /*public void addService(Map<String, Object> service) {
+        this.services.add(service);
+    }
+
+    public ArrayList<Map<String, Object>> getServices() {
+        return services;
+    }*/
 }

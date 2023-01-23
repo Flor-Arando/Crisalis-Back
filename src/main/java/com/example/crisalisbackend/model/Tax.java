@@ -1,9 +1,12 @@
 package com.example.crisalisbackend.model;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -15,6 +18,12 @@ public class Tax {
     private int id;
     private String name;
     private float aliquot;
+
+    @OneToMany(mappedBy = "tax")
+    private Set<OrderProduct> orderProducts;
+
+    @OneToMany(mappedBy = "tax")
+    private Set<OrderService> orderServices;
     
     public Tax(int id, String name, float aliquot) {
         this.id = id;
@@ -44,6 +53,22 @@ public class Tax {
 
     public void setAliquot(float aliquot) {
         this.aliquot = aliquot;
+    }
+
+    public Set<OrderProduct> getOrderProducts() {
+        return orderProducts;
+    }
+
+    public void setOrderProducts(Set<OrderProduct> orderProducts) {
+        this.orderProducts = orderProducts;
+    }
+
+    public Set<OrderService> getOrderServices() {
+        return orderServices;
+    }
+
+    public void setOrderServices(Set<OrderService> orderServices) {
+        this.orderServices = orderServices;
     }
 
 }

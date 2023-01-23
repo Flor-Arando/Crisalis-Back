@@ -6,7 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+//import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.data.relational.core.mapping.Embedded.Nullable;
@@ -22,8 +23,12 @@ public class Service {
     @Nullable
     private float supportPrice; // TODO: que se pueda poner null
 
-    @ManyToMany(mappedBy = "services")
-    Set<Order> orders;    
+    /*
+     * @ManyToMany(mappedBy = "services")
+     * Set<Order> orders;
+     */
+    @OneToMany(mappedBy = "service")
+    private Set<OrderService> orderServices;
 
     public Service() {
     }
@@ -64,5 +69,13 @@ public class Service {
 
     public void setSupportPrice(float supportPrice) {
         this.supportPrice = supportPrice;
-    }   
+    }
+
+    public Set<OrderService> getOrderServices() {
+        return orderServices;
+    }
+
+    public void setServices(Set<OrderService> orderServices) {
+        this.orderServices = orderServices;
+    }
 }

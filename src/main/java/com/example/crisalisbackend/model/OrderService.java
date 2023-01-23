@@ -9,8 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="_order_product")
-public class OrderProduct {
+@Table(name="_order_service")
+public class OrderService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -20,25 +20,24 @@ public class OrderProduct {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "id_product", nullable = false)
-    private Product product;
+    @JoinColumn(name = "id_service", nullable = false)
+    private Service service;
 
     @ManyToOne
     @JoinColumn(name = "id_tax", nullable = true)
     private Tax tax;
 
-    private int warranty;
     private double totalPrice;
-    private int quantity;
 
-    public OrderProduct() {
+    public OrderService() {
 
     }
 
-    public OrderProduct(Order order, Product product, int warranty) {
+    public OrderService(int id, Order order, Service service, double totalPrice) {
+        this.id = id;
         this.order = order;
-        this.product = product;
-        this.warranty = warranty;
+        this.service = service;
+        this.totalPrice = totalPrice;
     }
 
     public int getId() {
@@ -57,20 +56,12 @@ public class OrderProduct {
         this.order = order;
     }
 
-    public Product getProduct() {
-        return product;
+    public Service getService() {
+        return service;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getWarranty() {
-        return warranty;
-    }
-
-    public void setWarranty(int warranty) {
-        this.warranty = warranty;
+    public void setService(Service service) {
+        this.service = service;
     }
 
     public double getTotalPrice() {
@@ -79,14 +70,6 @@ public class OrderProduct {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public Tax getTax() {
