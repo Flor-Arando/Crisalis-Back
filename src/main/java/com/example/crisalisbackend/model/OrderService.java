@@ -28,6 +28,7 @@ public class OrderService {
     private Tax tax;
 
     private double totalPrice;
+//TODO: Agregar supportPrice para este pedido servicio
 
     public OrderService() {
 

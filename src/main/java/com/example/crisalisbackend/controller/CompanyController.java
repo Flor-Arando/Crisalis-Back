@@ -47,7 +47,8 @@ public class CompanyController {
 
     @PostMapping("/create")
      public ResponseEntity<?> create(@RequestBody dtoCompany dtoCompany){     
-            
+        
+        // TODO: unificar las validaciones con las de update segun correspondan
         if(companyService.existsByCuit(dtoCompany.getCuit())) {
             return new ResponseEntity<Message>(new Message("El cuil de la empresa ya existe"), HttpStatus.BAD_REQUEST);//cambiar por DNI
         }
@@ -61,18 +62,19 @@ public class CompanyController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody dtoCompany dtoCompany){
         
-        if(!companyService.existsById(id)) {
+        if (!companyService.existsById(id)) {
             return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.BAD_REQUEST);
         }
             
         
-        if(companyService.existsByCuit(dtoCompany.getCuit())) {
+        if (companyService.existsByCuit(dtoCompany.getCuit()) && (id < 1)) {
             return new ResponseEntity<Message>(new Message("La empresa ya existe"), HttpStatus.BAD_REQUEST);
         } 
            
               
         Company company = companyService.getOne(id).get();
         company.setCompanyName(dtoCompany.getCompanyName());
+        // TODO: se está guardando la fecha del dia anterior a la que se selecciona. El request esta bien, pero en get del dto no
         company.setActivityStart((dtoCompany.getActivityStart()));
         company.setCuit((dtoCompany.getCuit()));
         

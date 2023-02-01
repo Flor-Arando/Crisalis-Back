@@ -19,6 +19,7 @@ import com.example.crisalisbackend.Dto.ServiceDTO;
 import com.example.crisalisbackend.Security.controller.Message;
 import com.example.crisalisbackend.model.Service;
 import com.example.crisalisbackend.service.ServiceService;
+import com.example.crisalisbackend.service.TaxService;
 
 @RestController
 @RequestMapping("servicio")
@@ -26,6 +27,8 @@ import com.example.crisalisbackend.service.ServiceService;
 public class ServiceController {
     @Autowired
     ServiceService serviceService;
+    @Autowired
+    TaxService taxService;
 
     @GetMapping("/list")
     public ResponseEntity<List<Service>> list() {
@@ -41,16 +44,16 @@ public class ServiceController {
         }
            
         Service service = serviceService.getOne(id).get();
-            return new ResponseEntity<>(service, HttpStatus.OK);
+        return new ResponseEntity<>(service, HttpStatus.OK);
     }
 
     @PostMapping("/create") //AGREGAR VALIDACIONES
      public ResponseEntity<?> create(@RequestBody ServiceDTO serviceDTO){     
         
-        Service service = new Service(serviceDTO.getName(), serviceDTO.getPrice(), serviceDTO.getSupportPrice());
+        Service service = new Service(serviceDTO.getName(), serviceDTO.getPrice(), serviceDTO.getSupportPrice(), taxService.getByIds(serviceDTO.getTaxes()));
         serviceService.save(service); //ordenar como en DTO 
         
-            return new ResponseEntity<Message>(new Message("Servicio agregado"), HttpStatus.OK);
+        return new ResponseEntity<Message>(new Message("Servicio agregado"), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}") //AGREGAR VALIDACIONES
@@ -64,9 +67,10 @@ public class ServiceController {
         service.setName(serviceDTO.getName());
         service.setPrice((serviceDTO.getPrice()));
         service.setSupportPrice(serviceDTO.getSupportPrice());
-        
+        service.setTaxes(taxService.getByIds(serviceDTO.getTaxes())); // TODO: validar los ids de tax
         serviceService.save(service);
-            return new ResponseEntity <Message>(new Message("Servicio actualizado"), HttpStatus.OK);            
+        
+        return new ResponseEntity <Message>(new Message("Servicio actualizado"), HttpStatus.OK);            
     }
 
     @DeleteMapping("/delete/{id}")

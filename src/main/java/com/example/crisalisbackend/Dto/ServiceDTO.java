@@ -1,5 +1,7 @@
 package com.example.crisalisbackend.Dto;
 
+import java.util.ArrayList;
+
 import javax.validation.constraints.NotBlank;
 
 public class ServiceDTO {
@@ -9,14 +11,16 @@ public class ServiceDTO {
     private float price;
     @NotBlank
     private float supportPrice;
+    private ArrayList<Integer>taxes;
     
     public ServiceDTO() {
     }
     
-    public ServiceDTO(@NotBlank String name, @NotBlank float price, @NotBlank float supportPrice) {
+    public ServiceDTO(@NotBlank String name, @NotBlank float price, @NotBlank float supportPrice, ArrayList <Integer> taxes) {
         this.name = name;
         this.price = price;
         this.supportPrice = supportPrice;
+        this.taxes = taxes;
     }
 
     public String getName() {
@@ -41,5 +45,13 @@ public class ServiceDTO {
 
     public void setSupportPrice(float supportPrice) {
         this.supportPrice = supportPrice;
+    }
+
+    public ArrayList<Integer> getTaxes() {
+        return taxes;
+    }
+
+    public void setTaxes(ArrayList<Integer> taxes) {
+        this.taxes = taxes;
     }
 }

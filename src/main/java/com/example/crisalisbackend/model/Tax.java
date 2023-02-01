@@ -6,8 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "_tax")
@@ -19,12 +24,9 @@ public class Tax {
     private String name;
     private float aliquot;
 
-    @OneToMany(mappedBy = "tax")
-    private Set<OrderProduct> orderProducts;
+    @ManyToMany(mappedBy = "taxes")
+    Set<Product> products;
 
-    @OneToMany(mappedBy = "tax")
-    private Set<OrderService> orderServices;
-    
     public Tax() {
 
     }
@@ -57,22 +59,6 @@ public class Tax {
 
     public void setAliquot(float aliquot) {
         this.aliquot = aliquot;
-    }
-
-    public Set<OrderProduct> getOrderProducts() {
-        return orderProducts;
-    }
-
-    public void setOrderProducts(Set<OrderProduct> orderProducts) {
-        this.orderProducts = orderProducts;
-    }
-
-    public Set<OrderService> getOrderServices() {
-        return orderServices;
-    }
-
-    public void setOrderServices(Set<OrderService> orderServices) {
-        this.orderServices = orderServices;
     }
 
 }

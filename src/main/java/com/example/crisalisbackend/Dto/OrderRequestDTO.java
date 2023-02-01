@@ -9,7 +9,7 @@ public class OrderRequestDTO {
     private int idCompany;
     private ArrayList<Map<String, Object>> products;
     private ArrayList<Map<String, Object>> services;
-    private int quantity;
+    //private int quantity;
     
     public OrderRequestDTO() {
     }
@@ -54,11 +54,11 @@ public class OrderRequestDTO {
         this.services = services;
     }
 
-    public int getQuantity() {
+    /*public int getQuantity() {
         return quantity;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
+    }*/
 }

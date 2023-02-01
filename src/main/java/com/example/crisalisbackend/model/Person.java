@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="_person")
 public class Person {
@@ -20,6 +22,7 @@ public class Person {
     private String lastName;
     private int dni;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "person")
     private List<Order> orders = new ArrayList<>();
 

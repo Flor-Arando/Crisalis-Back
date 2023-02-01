@@ -42,7 +42,7 @@ public class PersonController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id){ //deberia ir Person pero me daba error porque se confunde con ResponseEntity<Message>
        
         if(!personService.existsById(id)) {

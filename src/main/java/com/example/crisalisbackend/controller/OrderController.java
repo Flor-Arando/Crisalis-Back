@@ -122,7 +122,7 @@ public class OrderController {
     {
         "idPerson" : 1,
         "idCompany" : 2,
-        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10, "tax" : "IVA"}],
+        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10}],
         "services" : []
     }
     */
@@ -148,12 +148,14 @@ public class OrderController {
         OrderDTO orderDTO = new OrderDTO();
 
         orderDTO.setId(order.getId());
-
+        
         if (order.getCompany() != null) {
             orderDTO.setCompany(order.getCompany().getCompanyName());
+            orderDTO.setIdCompany(order.getCompany().getId());
         }
         
         orderDTO.setPerson(order.getPerson().getFullName());
+        orderDTO.setIdPerson(order.getPerson().getId());
 
         for (OrderService orderService : order.getOrderServices()) {
             Map<String, Object> data = new HashMap<>();
@@ -162,6 +164,8 @@ public class OrderController {
             data.put("name", service.getName());
             data.put("price", service.getPrice());
             data.put("support_price", service.getSupportPrice());
+            /*data.put("tax", orderService.getTax().getName());*/
+           
             orderDTO.addService(data);
         }
 
@@ -174,6 +178,8 @@ public class OrderController {
             data.put("warranty", orderProduct.getWarranty());
             data.put("quantity", orderProduct.getQuantity());
             data.put("total_price", orderProduct.getTotalPrice());
+            /*data.put("tax", orderProduct.getTax().getName());*/
+            
             orderDTO.addProduct(data);
         }
 
@@ -188,13 +194,13 @@ public class OrderController {
         } else {
             order.setCreationDate(new Date());
         }
-
-        Optional<Person> person = personService.getOne(data.getIdPerson());
+System.out.println("qqq");
+        Optional<Person> person = personService.getOne((int) data.getIdPerson());
         if (person.isEmpty()) {
             throw new Exception("No se encontró la persona solicitada");
         }
         order.setPerson(person.get());
-
+        System.out.println("aaa");
         int idCompany = data.getIdCompany();
         if (idCompany > 0) {
             Optional<Company> company = companyService.getOne(data.getIdCompany());
@@ -206,54 +212,72 @@ public class OrderController {
         } else {
             order.setCompany(null); // Si no llega IdCompany, queda en NULL
         }
-
+        System.out.println("bbb");
         for (Map<String, Object> serviceData : data.getServices()) {
-            Optional<Service> service = serviceService.getOne((int) serviceData.get("id"));
+            Optional<Service> service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id")));
 
             if (service.isEmpty()) {
                 throw new Exception("No se encontró el servicio con id " + serviceData.get("id"));
             }
         }
-                
+        System.out.println("ccc");
         for (Map<String, Object> productData : data.getProducts()) {
-            Optional<Product> product = productService.getOne((int) productData.get("id"));
+            Optional<Product> product = productService.getOne( Integer.parseInt((String) productData.get("id")));
             if (product.isEmpty()) {
                 throw new Exception("No se encontró el producto con id " + productData.get("id"));
             }
 
-            Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
+            /*Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
             if (tax.isEmpty()) {
                 throw new Exception("No se encontró el impuesto con id " + productData.get("tax"));
-            }
+            }*/
         }
-
+        System.out.println("ddd");
         orderService.save(order);
+
+        System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
 
         orderServiceService.deleteByOrderId(order.getId());
         if (data.getServices().size() > 0) {
+        System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
             for (Map<String, Object> serviceData : data.getServices()) {
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 OrderService orderService = new OrderService();
-                Service service = serviceService.getOne((int) serviceData.get("id")).get();
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+                Service service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id"))).get();
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 orderService.setOrder(order);
                 orderService.setService(service);
                 orderService.setTotalPrice(999); // TODO: calcular valor con descuentos
                 orderServiceService.save(orderService);
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
             }
         }
 
         orderProductService.deleteByOrderId(order.getId());
         if (data.getProducts().size() > 0) {
+            System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
             for (Map<String, Object> productData : data.getProducts()) {
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 OrderProduct orderProduct = new OrderProduct();
-                Tax tax = taxService.getByName((String) productData.get("tax")).get();
-                Product product = productService.getOne((int) productData.get("id")).get();
+                /*Tax tax = taxService.getByName((String) productData.get("tax")).get();*/
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+                Product product = productService.getOne(Integer.parseInt((String) productData.get("id"))).get();
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(product);
                 orderProduct.setWarranty((int) productData.get("warranty"));
                 orderProduct.setQuantity((int) productData.get("quantity"));
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
                 orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
-                orderProduct.setTax(tax);
+                /*orderProduct.setTax(tax);*/
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
                 orderProductService.save(orderProduct);
+                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
             }
         }
     }

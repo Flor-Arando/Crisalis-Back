@@ -1,5 +1,6 @@
 package com.example.crisalisbackend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.example.crisalisbackend.Dto.dtoProduct;
 import com.example.crisalisbackend.Security.controller.Message;
 import com.example.crisalisbackend.model.Product;
 import com.example.crisalisbackend.service.ProductService;
+import com.example.crisalisbackend.service.TaxService;
 
 @RestController
 @RequestMapping("producto")
@@ -27,6 +29,8 @@ public class ProductController {
     
     @Autowired
     ProductService productService;
+    @Autowired
+    TaxService taxService;
 
     @GetMapping("/list")
     public ResponseEntity<List<Product>> list() {
@@ -38,7 +42,7 @@ public class ProductController {
     public ResponseEntity<?> getById(@PathVariable("id") int id){ 
        
         if(!productService.existsById(id)) {
-            return new ResponseEntity<Message>(new Message("El id no existe"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.NOT_FOUND);
         }
            
         Product product = productService.getOne(id).get();
@@ -57,19 +61,20 @@ public class ProductController {
         no hay ID en dtoProduct por eso no va esta condición
         }*/
         
-        Product product = new Product(dtoProduct.getName(), dtoProduct.getUnitPrice());
+        Product product = new Product(dtoProduct.getName(), dtoProduct.getUnitPrice(), taxService.getByIds(dtoProduct.getTaxes()));
         productService.save(product);
         
-            return new ResponseEntity<Message>(new Message("Producto agregado"), HttpStatus.OK);
+        
+        return new ResponseEntity<Message>(new Message("Producto agregado"), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody dtoProduct dtoProduct){
         
-        if(!productService.existsById(id)) {
+        if (!productService.existsById(id)) {
             return new ResponseEntity<Message>(new Message("El ID no existe"), HttpStatus.BAD_REQUEST);
         }
-            
+        
         
         /*if(productService.(dtoProduct.isWarranty())) {
             return new ResponseEntity<Message>(new Message("La empresa ya existe"), HttpStatus.BAD_REQUEST);
@@ -79,10 +84,10 @@ public class ProductController {
         Product product = productService.getOne(id).get();
         product.setName(dtoProduct.getName());
         product.setUnitPrice((dtoProduct.getUnitPrice()));
-        
+        product.setTaxes(taxService.getByIds(dtoProduct.getTaxes())); // TODO: validar los ids de tax
         productService.save(product);
-            return new ResponseEntity <Message>(new Message("Producto actualizado"), HttpStatus.OK);
-             
+
+        return new ResponseEntity <Message>(new Message("Producto actualizado"), HttpStatus.OK);     
     }
 
     @DeleteMapping("/delete/{id}")
