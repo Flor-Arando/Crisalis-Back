@@ -164,6 +164,9 @@ public class OrderController {
             data.put("name", service.getName());
             data.put("price", service.getPrice());
             data.put("support_price", service.getSupportPrice());
+            data.put("active", orderService.isActive());
+            data.put("orderServiceId", orderService.getId());
+            
             /*data.put("tax", orderService.getTax().getName());*/
            
             orderDTO.addService(data);
@@ -280,6 +283,17 @@ System.out.println("qqq");
 
             }
         }
+    }
+
+    @GetMapping("/with-services")
+    public ResponseEntity<List<OrderDTO>> withServices() {
+        List<OrderDTO> orders = new ArrayList<>();
+
+        for (Order order : orderService.listWithServices()) {
+            orders.add(mapOrderDTO(order));
+        }
+
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
     private double calculateProductTotalPrice (Product product, int quantity, int idCompany) {

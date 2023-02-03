@@ -37,4 +37,8 @@ public class OrderService {
     public boolean existsById(int id) {
         return orderRepository.existsById(id);
     }
+
+    public List<Order> listWithServices() {
+        return orderRepository.findAll();
+    }
 }

@@ -11,14 +11,19 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NamedQuery;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @Entity
 @Table(name="_order")
+//@NamedQuery(name = "Order.findByServiceNotNull", query = "select u from User u where u.emailAddress = ?1")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +45,7 @@ public class Order {
     private Set<OrderProduct> orderProducts;
 
     @OneToMany(mappedBy = "order")
+    @JsonBackReference
     private Set<OrderService> orderServices;
 /*
     @ManyToMany

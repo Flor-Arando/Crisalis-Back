@@ -8,6 +8,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name="_order_service")
 public class OrderService {
@@ -15,20 +18,24 @@ public class OrderService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "id_order", nullable = false)
     private Order order;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_service", nullable = false)
     private Service service;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_tax", nullable = true)
     private Tax tax;
 
     private double totalPrice;
 //TODO: Agregar supportPrice para este pedido servicio
+    private boolean active;
 
     public OrderService() {
 
@@ -79,5 +86,13 @@ public class OrderService {
 
     public void setTax(Tax tax) {
         this.tax = tax;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
