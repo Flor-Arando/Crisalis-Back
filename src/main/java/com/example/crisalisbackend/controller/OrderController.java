@@ -296,10 +296,7 @@ System.out.println("qqq");
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    private double calculateProductTotalPrice (Product product, int quantity, int idCompany) {
-        double tax = idCompany > 0 ? 1.035 : 1; // TODO: ver por que no se puede usar float
-        return product.getUnitPrice() * 1.21 * tax * quantity;
-    }
+    
 }
 //TODO: cambiar metodo calculateProductTotalPrice en un service y que los valores de tax esten cargados en
 //la base de datos y los tome de ahi a los valores 
