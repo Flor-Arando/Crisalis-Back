@@ -15,10 +15,11 @@ public class PriceCalculatorService {
     OrderRepository orderRepository;
 
     private static float PRODUCT_DISCOUNT_ACTIVE_SERVICE = 10;
+    private static float PRODUCT_WARRANTY_INCREASE = 2;
     private static float MAXIMUM_PRODUCT_DISCOUNT_VALUE = 2500;
 
 
-    public double calculateProductTotalPrice (Product product, int quantity, int idCompany, int idPerson) {
+    public double calculateProductTotalPrice (Product product, int quantity, int warranty, int idPerson) {
         
         float taxValue = 0;
 
@@ -31,20 +32,23 @@ public class PriceCalculatorService {
 
         for (OrderService orderService : order.getOrderServices()) {
 
-            if(orderService.isActive()) {
+            if (orderService.isActive()) {
                 isActive = true;
                 break;
             }
         }
 
-        float productPrice;
-        productPrice = product.getUnitPrice() + taxValue;
-        
-        float discount = productPrice * (PriceCalculatorService.PRODUCT_DISCOUNT_ACTIVE_SERVICE / 100);
+        float productPrice = product.getUnitPrice() + taxValue;
 
         if (isActive) {
-            productPrice -= discount;
+            float discount = productPrice * (PRODUCT_DISCOUNT_ACTIVE_SERVICE / 100);
+            productPrice -= Math.min(discount, MAXIMUM_PRODUCT_DISCOUNT_VALUE);
         }
-        
+
+        float warrantyValue = (productPrice * (PRODUCT_WARRANTY_INCREASE / 100)) * warranty;
+
+        float productFinalPrice = productPrice + warrantyValue;
+
+        return productFinalPrice * quantity;        
     }   
 }
