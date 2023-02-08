@@ -12,21 +12,49 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.crisalisbackend.model.Order;
 import com.example.crisalisbackend.model.OrderService;
+import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.repository.ServiceStateRepository;
+import com.example.crisalisbackend.service.PersonService;
 
 @Controller
-@RequestMapping(path = "/estado")
+@RequestMapping(path = "/order-service")
 public class OrderServiceController {
     //update - list
 
     @Autowired
     private ServiceStateRepository serviceStateRepository;
 
+    @Autowired
+    private PersonService personService;
+    
+
     @CrossOrigin(origins = "*")
     @GetMapping(path = "/list")
     public @ResponseBody Iterable<OrderService> getStates() {
         return this.serviceStateRepository.findAll();
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping(path = "/active/{id}")
+    public @ResponseBody boolean isActive(@PathVariable("id") int id) {
+
+        boolean isActive = false; 
+        Person person = personService.getOne(id).get();
+
+        
+        for (Order order : person.getOrders()) {
+            for (OrderService orderService : order.getOrderServices()) {
+
+                if (orderService.isActive()) {
+                    isActive = true;
+                    break;
+                }
+            }
+        }
+        
+        return isActive;
     }
 
    /* @CrossOrigin(origins = "*")

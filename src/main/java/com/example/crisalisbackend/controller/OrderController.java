@@ -166,8 +166,7 @@ public class OrderController {
             data.put("support_price", service.getSupportPrice());
             data.put("active", orderService.isActive());
             data.put("orderServiceId", orderService.getId());
-            
-            /*data.put("tax", orderService.getTax().getName());*/
+            data.put("taxes", service.getTaxes());
            
             orderDTO.addService(data);
         }
@@ -181,7 +180,7 @@ public class OrderController {
             data.put("warranty", orderProduct.getWarranty());
             data.put("quantity", orderProduct.getQuantity());
             data.put("total_price", orderProduct.getTotalPrice());
-            /*data.put("tax", orderProduct.getTax().getName());*/
+            data.put("taxes", product.getTaxes());
             
             orderDTO.addProduct(data);
         }
@@ -197,13 +196,13 @@ public class OrderController {
         } else {
             order.setCreationDate(new Date());
         }
-System.out.println("qqq");
+
         Optional<Person> person = personService.getOne((int) data.getIdPerson());
         if (person.isEmpty()) {
             throw new Exception("No se encontró la persona solicitada");
         }
         order.setPerson(person.get());
-        System.out.println("aaa");
+        
         int idCompany = data.getIdCompany();
         if (idCompany > 0) {
             Optional<Company> company = companyService.getOne(data.getIdCompany());
@@ -274,7 +273,7 @@ System.out.println("qqq");
                 orderProduct.setQuantity((int) productData.get("quantity"));
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
 
-                orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
+                //orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
                 /*orderProduct.setTax(tax);*/
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
 

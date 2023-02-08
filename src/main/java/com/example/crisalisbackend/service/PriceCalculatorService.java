@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.crisalisbackend.model.Order;
 import com.example.crisalisbackend.model.Product;
 import com.example.crisalisbackend.model.OrderService;
-
+import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.model.Tax;
 import com.example.crisalisbackend.repository.OrderRepository;
 
@@ -19,7 +19,7 @@ public class PriceCalculatorService {
     private static float MAXIMUM_PRODUCT_DISCOUNT_VALUE = 2500;
 
 
-    public double calculateProductTotalPrice (Product product, int quantity, int warranty, int idPerson) {
+    public double calculateProductTotalPrice (Product product, int quantity, int warranty, Person person) {
         
         float taxValue = 0;
 
@@ -27,7 +27,7 @@ public class PriceCalculatorService {
             taxValue += (tax.getAliquot() / 100) * product.getUnitPrice();    
         } 
 
-        Order order = orderRepository.findByIdPerson(idPerson).get();
+        Order order = orderRepository.findByPerson(person).get();
         boolean isActive = false;
 
         for (OrderService orderService : order.getOrderServices()) {

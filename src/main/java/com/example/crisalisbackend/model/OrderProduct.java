@@ -23,9 +23,9 @@ public class OrderProduct {
     @JoinColumn(name = "id_product", nullable = false)
     private Product product;
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "id_tax", nullable = true)
-    private Tax tax;
+    private Tax tax;*/
 
     private int warranty;
     private double totalPrice;
@@ -89,11 +89,11 @@ public class OrderProduct {
         this.quantity = quantity;
     }
 
-    public Tax getTax() {
+    /*public Tax getTax() {
         return tax;
     }
 
     public void setTax(Tax tax) {
         this.tax = tax;
-    }
+    }*/
 }
