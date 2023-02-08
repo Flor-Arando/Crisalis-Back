@@ -30,7 +30,6 @@ import com.example.crisalisbackend.model.OrderService;
 import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.model.Product;
 import com.example.crisalisbackend.model.Service;
-import com.example.crisalisbackend.model.Tax;
 import com.example.crisalisbackend.service.CompanyService;
 import com.example.crisalisbackend.service.OrderProductService;
 import com.example.crisalisbackend.service.OrderServiceService;
@@ -75,19 +74,21 @@ public class OrderController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         if (!orderService.existsById(id)) {
-            return new ResponseEntity <Message>(new Message("No existe un pedido con el id solicitado."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Message>(new Message("No existe un pedido con el id solicitado."),
+                    HttpStatus.NOT_FOUND);
         }
 
         orderProductService.deleteByOrderId(id);
         orderServiceService.deleteByOrderId(id);
         orderService.delete(id);
-        return new ResponseEntity <Message>(new Message("Pedido eliminado."), HttpStatus.OK);
+        return new ResponseEntity<Message>(new Message("Pedido eliminado."), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id) {
         if (!orderService.existsById(id)) {
-            return new ResponseEntity<Message>(new Message("No existe un pedido con el id solicitado."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Message>(new Message("No existe un pedido con el id solicitado."),
+                    HttpStatus.NOT_FOUND);
         }
 
         Order order = orderService.getOne(id).get();
@@ -96,39 +97,39 @@ public class OrderController {
     }
 
     /*
-    EJEMPLO DE REQUEST
-    {
-        "idPerson" : 1,
-        "idCompany" : 1,
-        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 1, "tax" : "IVA"}],
-        "services" : [{"id" : 1}]
-    }
-    */
+     * EJEMPLO DE REQUEST
+     * {
+     * "idPerson" : 1,
+     * "idCompany" : 1,
+     * "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 1, "tax" : "IVA"}],
+     * "services" : [{"id" : 1}]
+     * }
+     */
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrderRequestDTO data) {
         Order order = new Order();
-        
+
         try {
             this.saveOrder(order, data);
         } catch (Exception e) {
             return new ResponseEntity<Message>(new Message(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         return new ResponseEntity<Message>(new Message("Orden agregada"), HttpStatus.CREATED);
     }
 
     /*
-    EJEMPLO DE REQUEST
-    {
-        "idPerson" : 1,
-        "idCompany" : 2,
-        "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10}],
-        "services" : []
-    }
-    */
+     * EJEMPLO DE REQUEST
+     * {
+     * "idPerson" : 1,
+     * "idCompany" : 2,
+     * "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10}],
+     * "services" : []
+     * }
+     */
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int idOrder, @RequestBody OrderRequestDTO data) {
-        
+
         try {
             Optional<Order> order = orderService.getOne(idOrder);
 
@@ -148,14 +149,15 @@ public class OrderController {
         OrderDTO orderDTO = new OrderDTO();
 
         orderDTO.setId(order.getId());
-        
+
         if (order.getCompany() != null) {
             orderDTO.setCompany(order.getCompany().getCompanyName());
             orderDTO.setIdCompany(order.getCompany().getId());
         }
-        
+
         orderDTO.setPerson(order.getPerson().getFullName());
         orderDTO.setIdPerson(order.getPerson().getId());
+        orderDTO.setCreationDate(order.getCreationDate()); //TODO: setear fecha de modificacion?
 
         for (OrderService orderService : order.getOrderServices()) {
             Map<String, Object> data = new HashMap<>();
@@ -209,12 +211,12 @@ public class OrderController {
             if (company.isEmpty()) {
                 throw new Exception("No se encontró la empresa solicitada");
             }
-    
+
             order.setCompany(company.get());
         } else {
             order.setCompany(null); // Si no llega IdCompany, queda en NULL
         }
-        System.out.println("bbb");
+
         for (Map<String, Object> serviceData : data.getServices()) {
             Optional<Service> service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id")));
 
@@ -222,26 +224,29 @@ public class OrderController {
                 throw new Exception("No se encontró el servicio con id " + serviceData.get("id"));
             }
         }
-        System.out.println("ccc");
+
         for (Map<String, Object> productData : data.getProducts()) {
-            Optional<Product> product = productService.getOne( Integer.parseInt((String) productData.get("id")));
+            Optional<Product> product = productService.getOne(Integer.parseInt((String) productData.get("id")));
             if (product.isEmpty()) {
                 throw new Exception("No se encontró el producto con id " + productData.get("id"));
             }
 
-            /*Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
-            if (tax.isEmpty()) {
-                throw new Exception("No se encontró el impuesto con id " + productData.get("tax"));
-            }*/
+            /*
+             * Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
+             * if (tax.isEmpty()) {
+             * throw new Exception("No se encontró el impuesto con id " +
+             * productData.get("tax"));
+             * }
+             */
         }
-        System.out.println("ddd");
+
         orderService.save(order);
 
         System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
 
         orderServiceService.deleteByOrderId(order.getId());
         if (data.getServices().size() > 0) {
-        System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+            System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
             for (Map<String, Object> serviceData : data.getServices()) {
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 OrderService orderService = new OrderService();
@@ -263,7 +268,7 @@ public class OrderController {
             for (Map<String, Object> productData : data.getProducts()) {
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 OrderProduct orderProduct = new OrderProduct();
-                /*Tax tax = taxService.getByName((String) productData.get("tax")).get();*/
+                /* Tax tax = taxService.getByName((String) productData.get("tax")).get(); */
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
                 Product product = productService.getOne(Integer.parseInt((String) productData.get("id"))).get();
                 System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
@@ -297,6 +302,3 @@ public class OrderController {
 
     
 }
-//TODO: cambiar metodo calculateProductTotalPrice en un service y que los valores de tax esten cargados en
-//la base de datos y los tome de ahi a los valores 
-//checkbox en abm de productos y servicios

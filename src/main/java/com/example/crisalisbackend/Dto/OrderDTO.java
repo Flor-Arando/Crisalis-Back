@@ -1,6 +1,7 @@
 package com.example.crisalisbackend.Dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 
 public class OrderDTO {
@@ -9,6 +10,8 @@ public class OrderDTO {
     String person;
     int idCompany;
     int idPerson;
+    Date creationDate;
+    Date lastModification;
     
     ArrayList<Map<String, Object>> services = new ArrayList<>();
     ArrayList<Map<String, Object>> products = new ArrayList<>();
@@ -77,11 +80,19 @@ public class OrderDTO {
         this.products = products;
     }
 
-    /*public void addService(Map<String, Object> service) {
-        this.services.add(service);
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public ArrayList<Map<String, Object>> getServices() {
-        return services;
-    }*/
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Date getLastModification() {
+        return lastModification;
+    }
+
+    public void setLastModification(Date lastModification) {
+        this.lastModification = lastModification;
+    }
 }
