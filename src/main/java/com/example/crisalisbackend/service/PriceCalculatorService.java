@@ -1,5 +1,7 @@
 package com.example.crisalisbackend.service;
 
+import java.io.Console;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.crisalisbackend.model.Order;
@@ -26,8 +28,9 @@ public class PriceCalculatorService {
         for (Tax tax : product.getTaxes()) {
             taxValue += (tax.getAliquot() / 100) * product.getUnitPrice();    
         } 
-
+     
         Order order = orderRepository.findByPerson(person).get();
+        System.out.println(order.getId());
         boolean isActive = false;
 
         for (OrderService orderService : order.getOrderServices()) {
@@ -37,7 +40,7 @@ public class PriceCalculatorService {
                 break;
             }
         }
-
+         
         float productPrice = product.getUnitPrice() + taxValue;
 
         if (isActive) {

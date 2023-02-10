@@ -1,5 +1,6 @@
 package com.example.crisalisbackend.controller;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import com.example.crisalisbackend.service.OrderProductService;
 import com.example.crisalisbackend.service.OrderServiceService;
 //import com.example.crisalisbackend.service.OrderService;
 import com.example.crisalisbackend.service.PersonService;
+import com.example.crisalisbackend.service.PriceCalculatorService;
 import com.example.crisalisbackend.service.ProductService;
 import com.example.crisalisbackend.service.ServiceService;
 import com.example.crisalisbackend.service.TaxService;
@@ -118,15 +120,6 @@ public class OrderController {
         return new ResponseEntity<Message>(new Message("Orden agregada"), HttpStatus.CREATED);
     }
 
-    /*
-     * EJEMPLO DE REQUEST
-     * {
-     * "idPerson" : 1,
-     * "idCompany" : 2,
-     * "products" : [{ "id" : 1, "warranty" : 20, "quantity" : 10}],
-     * "services" : []
-     * }
-     */
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int idOrder, @RequestBody OrderRequestDTO data) {
 
@@ -158,7 +151,7 @@ public class OrderController {
         orderDTO.setPerson(order.getPerson().getFullName());
         orderDTO.setIdPerson(order.getPerson().getId());
         orderDTO.setCreationDate(order.getCreationDate()); //TODO: setear fecha de modificacion?
-
+        //orderDTO.setDni(order.getPerson().getDni());
         for (OrderService orderService : order.getOrderServices()) {
             Map<String, Object> data = new HashMap<>();
             Service service = orderService.getService();
@@ -169,6 +162,7 @@ public class OrderController {
             data.put("active", orderService.isActive());
             data.put("orderServiceId", orderService.getId());
             data.put("taxes", service.getTaxes());
+            
            
             orderDTO.addService(data);
         }
@@ -191,7 +185,7 @@ public class OrderController {
     }
 
     private void saveOrder(Order order, OrderRequestDTO data) throws Exception {
-        // TODO: falta validar todos los valores que se reciben en la solicitud
+        PriceCalculatorService priceCalculatorService = new PriceCalculatorService();
 
         if (order.getId() > 0) {
             order.setLastModification(new Date());
@@ -214,7 +208,7 @@ public class OrderController {
 
             order.setCompany(company.get());
         } else {
-            order.setCompany(null); // Si no llega IdCompany, queda en NULL
+            order.setCompany(null); 
         }
 
         for (Map<String, Object> serviceData : data.getServices()) {
@@ -231,59 +225,48 @@ public class OrderController {
                 throw new Exception("No se encontró el producto con id " + productData.get("id"));
             }
 
-            /*
-             * Optional<Tax> tax = taxService.getByName((String) productData.get("tax"));
-             * if (tax.isEmpty()) {
-             * throw new Exception("No se encontró el impuesto con id " +
-             * productData.get("tax"));
-             * }
-             */
+
         }
 
         orderService.save(order);
 
-        System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
 
         orderServiceService.deleteByOrderId(order.getId());
         if (data.getServices().size() > 0) {
-            System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
             for (Map<String, Object> serviceData : data.getServices()) {
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+        
                 OrderService orderService = new OrderService();
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+               
                 Service service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id"))).get();
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+              
                 orderService.setOrder(order);
                 orderService.setService(service);
-                orderService.setTotalPrice(999); // TODO: calcular valor con descuentos
+                orderService.setTotalPrice(999); 
                 orderServiceService.save(orderService);
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+                
 
             }
         }
 
         orderProductService.deleteByOrderId(order.getId());
         if (data.getProducts().size() > 0) {
-            System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+
             for (Map<String, Object> productData : data.getProducts()) {
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+               
                 OrderProduct orderProduct = new OrderProduct();
-                /* Tax tax = taxService.getByName((String) productData.get("tax")).get(); */
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+                
                 Product product = productService.getOne(Integer.parseInt((String) productData.get("id"))).get();
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+                
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(product);
-                orderProduct.setWarranty((int) productData.get("warranty"));
+                int warranty = (productData.get("warranty") != null) ? (int) productData.get("warranty") : 0;
+                orderProduct.setWarranty(warranty);
                 orderProduct.setQuantity((int) productData.get("quantity"));
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
-
-                //orderProduct.setTotalPrice(this.calculateProductTotalPrice(product, orderProduct.getQuantity(), idCompany));  
-                /*orderProduct.setTax(tax);*/
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
-
+                //orderProduct.setTotalPrice(priceCalculatorService.calculateProductTotalPrice(product, orderProduct.getQuantity(), orderProduct.getWarranty(), order.getPerson()));
+                orderProduct.setTotalPrice(9);
                 orderProductService.save(orderProduct);
-                System.out.println(new Throwable().getStackTrace()[0].getLineNumber());
+               
 
             }
         }

@@ -9,4 +9,5 @@ import com.example.crisalisbackend.model.Person;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
     public Optional<Order> findByPerson(Person person);
+    //public Optional<Order> findByIdPerson(int id);
 }

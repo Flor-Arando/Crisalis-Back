@@ -95,4 +95,5 @@ public class OrderDTO {
     public void setLastModification(Date lastModification) {
         this.lastModification = lastModification;
     }
+
 }
