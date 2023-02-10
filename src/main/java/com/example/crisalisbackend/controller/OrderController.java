@@ -1,6 +1,5 @@
 package com.example.crisalisbackend.controller;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +33,6 @@ import com.example.crisalisbackend.model.Service;
 import com.example.crisalisbackend.service.CompanyService;
 import com.example.crisalisbackend.service.OrderProductService;
 import com.example.crisalisbackend.service.OrderServiceService;
-//import com.example.crisalisbackend.service.OrderService;
 import com.example.crisalisbackend.service.PersonService;
 import com.example.crisalisbackend.service.PriceCalculatorService;
 import com.example.crisalisbackend.service.ProductService;
@@ -61,6 +59,8 @@ public class OrderController {
     OrderServiceService orderServiceService;
     @Autowired
     TaxService taxService;
+    @Autowired
+    PriceCalculatorService priceCalculatorService;
 
     @GetMapping("/list")
     public ResponseEntity<List<OrderDTO>> list() {
@@ -151,10 +151,11 @@ public class OrderController {
         orderDTO.setPerson(order.getPerson().getFullName());
         orderDTO.setIdPerson(order.getPerson().getId());
         orderDTO.setCreationDate(order.getCreationDate()); //TODO: setear fecha de modificacion?
-        //orderDTO.setDni(order.getPerson().getDni());
+        
         for (OrderService orderService : order.getOrderServices()) {
-            Map<String, Object> data = new HashMap<>();
             Service service = orderService.getService();
+
+            Map<String, Object> data = new HashMap<>();
             data.put("id", service.getId());
             data.put("name", service.getName());
             data.put("price", service.getPrice());
@@ -163,13 +164,13 @@ public class OrderController {
             data.put("orderServiceId", orderService.getId());
             data.put("taxes", service.getTaxes());
             
-           
             orderDTO.addService(data);
         }
 
         for (OrderProduct orderProduct : order.getOrderProducts()) {
-            Map<String, Object> data = new HashMap<>();
             Product product = orderProduct.getProduct();
+
+            Map<String, Object> data = new HashMap<>();
             data.put("id", product.getId());
             data.put("name", product.getName());
             data.put("unit_price", product.getUnitPrice());
@@ -185,14 +186,12 @@ public class OrderController {
     }
 
     private void saveOrder(Order order, OrderRequestDTO data) throws Exception {
-        PriceCalculatorService priceCalculatorService = new PriceCalculatorService();
-
         if (order.getId() > 0) {
             order.setLastModification(new Date());
         } else {
             order.setCreationDate(new Date());
         }
-
+        
         Optional<Person> person = personService.getOne((int) data.getIdPerson());
         if (person.isEmpty()) {
             throw new Exception("No se encontró la persona solicitada");
@@ -210,7 +209,7 @@ public class OrderController {
         } else {
             order.setCompany(null); 
         }
-
+        
         for (Map<String, Object> serviceData : data.getServices()) {
             Optional<Service> service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id")));
 
@@ -218,56 +217,44 @@ public class OrderController {
                 throw new Exception("No se encontró el servicio con id " + serviceData.get("id"));
             }
         }
-
+        
         for (Map<String, Object> productData : data.getProducts()) {
             Optional<Product> product = productService.getOne(Integer.parseInt((String) productData.get("id")));
+            
             if (product.isEmpty()) {
                 throw new Exception("No se encontró el producto con id " + productData.get("id"));
             }
-
-
         }
-
+        
         orderService.save(order);
-
-
+        
         orderServiceService.deleteByOrderId(order.getId());
         if (data.getServices().size() > 0) {
-
             for (Map<String, Object> serviceData : data.getServices()) {
-        
-                OrderService orderService = new OrderService();
-               
                 Service service = serviceService.getOne(Integer.parseInt((String) serviceData.get("id"))).get();
-              
+
+                OrderService orderService = new OrderService();
                 orderService.setOrder(order);
                 orderService.setService(service);
                 orderService.setTotalPrice(999); 
                 orderServiceService.save(orderService);
-                
-
             }
         }
-
+        
         orderProductService.deleteByOrderId(order.getId());
         if (data.getProducts().size() > 0) {
-
             for (Map<String, Object> productData : data.getProducts()) {
-               
-                OrderProduct orderProduct = new OrderProduct();
-                
                 Product product = productService.getOne(Integer.parseInt((String) productData.get("id"))).get();
-                
+                int warranty = (productData.get("warranty") != null) ? (int) productData.get("warranty") : 0;
+
+                OrderProduct orderProduct = new OrderProduct();
                 orderProduct.setOrder(order);
                 orderProduct.setProduct(product);
-                int warranty = (productData.get("warranty") != null) ? (int) productData.get("warranty") : 0;
                 orderProduct.setWarranty(warranty);
                 orderProduct.setQuantity((int) productData.get("quantity"));
-                //orderProduct.setTotalPrice(priceCalculatorService.calculateProductTotalPrice(product, orderProduct.getQuantity(), orderProduct.getWarranty(), order.getPerson()));
-                orderProduct.setTotalPrice(9);
-                orderProductService.save(orderProduct);
-               
+                orderProduct.setTotalPrice(priceCalculatorService.calculateProductTotalPrice(product, orderProduct.getQuantity(), orderProduct.getWarranty(), order.getPerson()));
 
+                orderProductService.save(orderProduct);
             }
         }
     }
@@ -282,6 +269,4 @@ public class OrderController {
 
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
-
-    
 }

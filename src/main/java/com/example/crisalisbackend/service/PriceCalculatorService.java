@@ -1,8 +1,11 @@
 package com.example.crisalisbackend.service;
 
-import java.io.Console;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Set;
 
 import com.example.crisalisbackend.model.Order;
 import com.example.crisalisbackend.model.Product;
@@ -11,8 +14,8 @@ import com.example.crisalisbackend.model.Person;
 import com.example.crisalisbackend.model.Tax;
 import com.example.crisalisbackend.repository.OrderRepository;
 
+@Service
 public class PriceCalculatorService {
-
     @Autowired
     OrderRepository orderRepository;
 
@@ -20,27 +23,29 @@ public class PriceCalculatorService {
     private static float PRODUCT_WARRANTY_INCREASE = 2;
     private static float MAXIMUM_PRODUCT_DISCOUNT_VALUE = 2500;
 
-
     public double calculateProductTotalPrice (Product product, int quantity, int warranty, Person person) {
-        
         float taxValue = 0;
 
         for (Tax tax : product.getTaxes()) {
             taxValue += (tax.getAliquot() / 100) * product.getUnitPrice();    
         } 
-     
-        Order order = orderRepository.findByPerson(person).get();
-        System.out.println(order.getId());
+        
         boolean isActive = false;
+        ArrayList<Optional<Order>> orders = orderRepository.getByPerson(person);
+        
+        for (Optional<Order> order : orders) {
+            Set<OrderService> orderServices = order.get().getOrderServices();
 
-        for (OrderService orderService : order.getOrderServices()) {
-
-            if (orderService.isActive()) {
-                isActive = true;
-                break;
+            if (orderServices != null) {
+                for (OrderService orderService : orderServices) {
+                    if (orderService.isActive()) {
+                        isActive = true;
+                        break;
+                    }
+                }
             }
         }
-         
+        
         float productPrice = product.getUnitPrice() + taxValue;
 
         if (isActive) {
